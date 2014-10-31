@@ -48,5 +48,20 @@ public class GameStateManager {
 		GameState g = gameStates.pop();
 		g.dispose();
 	}
-
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
