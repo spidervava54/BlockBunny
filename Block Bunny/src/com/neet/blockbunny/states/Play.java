@@ -10,10 +10,13 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.neet.blockbunny.handlers.B2DVars;
 import com.neet.blockbunny.handlers.GameStateManager;
+import com.neet.blockbunny.handlers.MyContactListener;
 import com.neet.blockbunny.main.Game;
 
 public class Play extends GameState {
@@ -27,7 +30,8 @@ public class Play extends GameState {
 		
 		super(gsm);
 		
-		world = new World(new Vector2(0, -9.81f), true);
+		world = new World(new Vector2(0, -0.81f), true);
+		world.setContactListener(new MyContactListener());
 		b2dr = new Box2DDebugRenderer();
 		
 		// create platform
@@ -40,7 +44,9 @@ public class Play extends GameState {
 		shape.setAsBox(50 / PPM, 5 / PPM);
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = shape;
-		body.createFixture(fdef);
+		fdef.filter.categoryBits = B2DVars.BIT_GROUND;
+		fdef.filter.maskBits = B2DVars.BIT_BOX | B2DVars.BIT_BALL;
+		body.createFixture(fdef).setUserData("ground");
 		
 		// create falling box
 		bdef.position.set(160 / PPM, 200 / PPM);
@@ -49,7 +55,21 @@ public class Play extends GameState {
 		
 		shape.setAsBox(5 / PPM, 5 / PPM);
 		fdef.shape = shape;
-		body.createFixture(fdef);
+		fdef.filter.categoryBits = B2DVars.BIT_BOX;
+		fdef.filter.maskBits = B2DVars.BIT_GROUND;
+		body.createFixture(fdef).setUserData("box");
+		
+		// create ball
+		bdef.position.set(153 / PPM, 220 / PPM);
+		body = world.createBody(bdef);
+		
+		CircleShape cshape = new CircleShape();
+		cshape.setRadius(5 / PPM);
+		fdef.shape = cshape;
+		fdef.restitution = 0.2f;
+		fdef.filter.categoryBits = B2DVars.BIT_BALL;
+		fdef.filter.maskBits = B2DVars.BIT_GROUND;
+		body.createFixture(fdef).setUserData("ball");
 		
 		// set up box2d cam
 		b2dCam = new OrthographicCamera();
@@ -76,12 +96,3 @@ public class Play extends GameState {
 	public void dispose() {}
 	
 }
-
-
-
-
-
-
-
-
-
